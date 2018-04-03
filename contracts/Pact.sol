@@ -13,6 +13,14 @@ contract Pact {
         uint256 money;
         uint256 date;
         uint256 time;
+        bool    ended;
+    }
+    
+    function completeContract(uint id) public {
+        if(msg.sender != bank) {
+            return;
+        }
+        pacts[id].ended = true;
     }
     
     function createpact(uint256 _benefeciary, uint256 _principal, uint256 _money,uint256 _time) public {
