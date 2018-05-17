@@ -60,7 +60,7 @@
 
 		web3.eth.defaultAccount = web3.eth.accounts[0];
 
-		var CoursetroContract = web3.eth.contract([
+		var Contract = web3.eth.contract([
 	{
 		"constant": false,
 		"inputs": [
@@ -210,16 +210,16 @@
 	}
 ]);
 
-	var Coursetro = CoursetroContract.at('0xb0c893c9343ccf21c6b5bfdfc5e9d3fce7239bbc');
-	console.log(Coursetro);
+	var pact = Contract.at('0xb0c893c9343ccf21c6b5bfdfc5e9d3fce7239bbc');
+	console.log(pact);
 
 	$("#button").click(function() {
 			$("#loader").show();	
-            Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), $("#time").val(), {from: web3.eth.accounts[0], gas:3000000});
+            pact.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), $("#time").val(), {from: web3.eth.accounts[0], gas:3000000});
 	});
 
 	$("#button2").click(function() {
-		Coursetro.getData($("#C_id").val(),function(error,result){
+		pact.getData($("#C_id").val(),function(error,result){
 			if(!error)
                 {
 					$("#Benefeciary").html(result[0] + ' id');
@@ -237,7 +237,7 @@
 		})
 	});
 
-	var newContractEvent = Coursetro.NewPact();
+	var newContractEvent = pact.NewPact();
 
 	newContractEvent.watch(function(error, result){
             if (!error)
