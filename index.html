@@ -209,13 +209,15 @@
 		"type": "function"
 	}
 ]);
-
+	
 	var Coursetro = CoursetroContract.at('0xba193acc8dede602616f2708a7aa40f5143282b4');
 	console.log(Coursetro);
 
 	$("#button").click(function() {
-			$("#loader").show();	
-            Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), $("#time").val(), {from: web3.eth.accounts[0], gas:3000000});
+			$("#loader").show();
+		time = Date.parse(donedate);
+    		time /= 1000;
+            	Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), $("#time").val(), {from: web3.eth.accounts[0], gas:3000000});
 	});
 
 	$("#button2").click(function() {
