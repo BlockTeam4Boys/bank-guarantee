@@ -215,9 +215,9 @@
 
 	$("#button").click(function() {
 			$("#loader").show();
-		time = Date.parse(donedate);
-    		time /= 1000;
-            	Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), $("#time").val(), {from: web3.eth.accounts[0], gas:3000000});
+		var sectime = Date.parse($("#time").val());
+    		sectime /= 1000;
+            	Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), sectime, {from: web3.eth.accounts[0], gas:3000000});
 	});
 
 	$("#button2").click(function() {
