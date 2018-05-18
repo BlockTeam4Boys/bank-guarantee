@@ -60,19 +60,44 @@
 
 		web3.eth.defaultAccount = web3.eth.accounts[0];
 
-		var CoursetroContract = web3.eth.contract([
+		var CoursetroContract = web3.eth.contract(  [
 	{
-		"constant": false,
+		"constant": true,
 		"inputs": [
 			{
 				"name": "id",
 				"type": "uint256"
 			}
 		],
-		"name": "completeContract",
-		"outputs": [],
+		"name": "getData",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -100,6 +125,26 @@
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "completeContract",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
 	},
 	{
 		"anonymous": false,
@@ -132,85 +177,10 @@
 		],
 		"name": "NewPact",
 		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "beneficiary",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "principal",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "money",
-				"type": "uint256"
-			}
-		],
-		"name": "CompletePact",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"name": "NoSuchPact",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "id",
-				"type": "uint256"
-			}
-		],
-		"name": "getData",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
 	}
-]);
+]  );
 	
-	var Coursetro = CoursetroContract.at('0xba193acc8dede602616f2708a7aa40f5143282b4');
+	var Coursetro = CoursetroContract.at('0xb64391ee40bbb39a3147a02ac9d6fa1e3bfcf80c');
 	console.log(Coursetro);
 
 	$("#button").click(function() {
