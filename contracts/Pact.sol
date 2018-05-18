@@ -24,25 +24,10 @@ contract Pact {
         uint256 time
     );
     
-    event CompletePact(
-        uint256 beneficiary,
-        uint256 principal,
-        uint256 money
-    );
-    
-    event NoSuchPact(
-        uint id
-    );
-    
     function completeContract(uint id) public {
         if(msg.sender != bank) {
             return;
         }
-        if(id > pact_id) {
-            NoSuchPact(id);
-            return;
-        }
-            
         pacts[id].ended = true;
     }
     
@@ -54,20 +39,16 @@ contract Pact {
         pacts[pact_id].principal = _principal;
         pacts[pact_id].money = _money;
         pacts[pact_id].date = now;
-        pacts[pact_id].time = now + _time * 1 days;
+        pacts[pact_id].time = _time;
         pact_id++;
         NewPact(_benefeciary, _principal, _money, now, _time);
     }
     
-    function getData(uint id) public constant returns(uint256, uint256, uint256,uint256, uint256) {
+    function getData(uint id) public constant returns(uint256, uint256, uint256,uint256, uint256, bool) {
         if(msg.sender != bank) {
             return;
         }
-        if(id > pact_id) {
-            NoSuchPact(id);
-            return;
-        }
-        return (pacts[id].beneficiary, pacts[id].principal, pacts[id].money, pacts[id].date, pacts[id].time);
+        return (pacts[id].beneficiary, pacts[id].principal, pacts[id].money, pacts[id].date, pacts[id].time, pacts[id].ended);
     }
     
     function Pact() public {
