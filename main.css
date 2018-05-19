@@ -1,6 +1,6 @@
 body {
     background-color:#F0F0F0;
-    padding: 2em;
+    padding: 1em;
     font-family: 'Raleway','Source Sans Pro', 'Arial';
 }
 .container {
@@ -8,9 +8,18 @@ body {
     width: 50%;
     margin: 0 auto;
 }
+.rightcontainer{
+    float: left;
+    width: 50%;
+    margin: 0 auto;
+}
+
 label {
     display:block;
     margin-bottom:10px;
+}
+.inputid {
+    width: 24%;
 }
 input {
     padding:10px;
@@ -22,11 +31,15 @@ button {
     padding: 1em 4em;
     display:block;
 }
+.get{
+	padding-top : 260px
+}
 
 .info {
     padding:1em;
     background-color:#fff;
     margin: 1em 0;
+    
 }
 
 #loader {

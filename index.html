@@ -35,18 +35,35 @@
 	</div>
 	<div class="container">
 
-		<h1>Get data</h1>
 
-		<label for="name" class="col-lg-2 control-label">Contract id</label>
-		<input id="C_id" type="text">
+		<div class = "getUp">
+		<div class="container">
+			<h1>Get data</h1>
 
-		<button id="button2">Get Data</button>
+			<label for="name" class="col-lg-2 control-label">Contract id</label>
+			<input class="inputid" id="C_id" type="text">
+
+			<button id="button2">Get Data</button>
+		</div>
+			
+		<div class="rightcontainer">
+			<h1>Complete Contract</h1>
+			<label for="name" class="col-lg-3 control-label">Contract id</label>
+			<input class="inputid" id="R_id" type="text">
+
+			<button id="button3">Complete Contract</button>
+		</div>
+		</div>
+
+		<div class = "get">
 
 		<h2 class="info" id="Benefeciary"></h2>
 		<h2 class="info" id="Principal"></h2>
 		<h2 class="info" id="Money"></h2>
 		<h2 class="info" id="Date"></h2>
 		<h2 class="info" id="Time"></h2>
+		<h2 class="info" id="isComplete"></h2>
+		</div>
 
 	</div>
 </body>
@@ -185,7 +202,7 @@
 
 	$("#button").click(function() {
 			$("#loader").show();
-		var sectime = Date.parse($("#time").val());
+		var sectime = new Date($("#time").val()).getTime() ;
     		sectime /= 1000;
             	Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), sectime, {from: web3.eth.accounts[0], gas:3000000});
 	});
@@ -197,16 +214,30 @@
 					$("#Benefeciary").html(result[0] + ' id');
 					$("#Principal").html(result[1] + ' id');
 					$("#Money").html(result[2] + ' руб');
-					var d = new Date(result[3]);
-					console.log(d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear());
-					$("#Date").html(result[3] + ' s');
-					$("#Time").html(result[4] + ' s');					
-					
+
+					var old = new Date(result[3] * 1000);
+					var oldDate = old.getDate() + '/' + (old.getMonth()+1) + '/' + old.getFullYear();
+					$("#Date").html(oldDate);
+
+					var newd = new Date(result[4] * 1000);
+					var newDate = newd.getDate() + '/' + (newd.getMonth()+1) + '/' + newd.getFullYear();
+					$("#Time").html(newDate);
+
+
+		
+					$("#isComplete").html(result[5] ? 'true' : 'false');	
                     console.log(result);
                 }
             else
                 console.error(error);
 		})
+	});
+
+
+
+	$("#button3").click(function() {
+
+            	Coursetro.completeContract($("#R_id").val(), {from: web3.eth.accounts[0], gas:300000});
 	});
 
 	var newContractEvent = Coursetro.NewPact();
