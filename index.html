@@ -209,31 +209,20 @@
 
 	$("#button2").click(function() {
 		Coursetro.getData($("#C_id").val(),function(error,result){
-			if(!error)
-                {
-					$("#Benefeciary").html(result[0] + ' id');
-					$("#Principal").html(result[1] + ' id');
-					$("#Money").html(result[2] + ' руб');
-
-					var old = new Date(result[3] * 1000);
-					var oldDate = old.getDate() + '/' + (old.getMonth()+1) + '/' + old.getFullYear();
-					$("#Date").html(oldDate);
-
-					var newd = new Date(result[4] * 1000);
-					var newDate = newd.getDate() + '/' + (newd.getMonth()+1) + '/' + newd.getFullYear();
-					$("#Time").html(newDate);
-
-
-		
-					$("#isComplete").html(result[5] ? 'true' : 'false');	
-                    console.log(result);
-                }
-            else
-                console.error(error);
-		})
-	});
-
-
+			if(!error) {
+				$("#Benefeciary").html(result[0] + ' id');
+				$("#Principal").html(result[1] + ' id');
+				$("#Money").html(result[2] + ' руб');
+				var old = new Date(result[3] * 1000);
+				var oldDate = old.getDate() + '/' + (old.getMonth()+1) + '/' + old.getFullYear();
+				$("#Date").html(oldDate);
+				var newd = new Date(result[4] * 1000);
+				var newDate = newd.getDate() + '/' + (newd.getMonth()+1) + '/' + newd.getFullYear();					$("#Time").html(newDate);
+				$("#isComplete").html(result[5] ? 'true' : 'false');	
+				console.log(result);
+                } else console.error(error);
+	})
+});
 
 	$("#button3").click(function() {
 
