@@ -39,10 +39,8 @@
 		<div class = "getUp">
 		<div class="container">
 			<h1>Get data</h1>
-
 			<label for="name" class="col-lg-2 control-label">Contract id</label>
 			<input class="inputid" id="C_id" type="text">
-
 			<button id="button2">Get Data</button>
 		</div>
 			
@@ -50,7 +48,6 @@
 			<h1>Complete Contract</h1>
 			<label for="name" class="col-lg-3 control-label">Contract id</label>
 			<input class="inputid" id="R_id" type="text">
-
 			<button id="button3">Complete Contract</button>
 		</div>
 		</div>
@@ -74,11 +71,8 @@
 		} else {
 			web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 		}
-
-		web3.eth.defaultAccount = web3.eth.accounts[0];
-
-		var CoursetroContract = web3.eth.contract(  [
-	{
+		var address = '0xb64391ee40bbb39a3147a02ac9d6fa1e3bfcf80c';
+		var ABI =	[{
 		"constant": true,
 		"inputs": [
 			{
@@ -194,21 +188,22 @@
 		],
 		"name": "NewPact",
 		"type": "event"
-	}
-]  );
+	}];
+	web3.eth.defaultAccount = web3.eth.accounts[0];
+
+	var contract = web3.eth.contract(ABI);
 	
-	var Coursetro = CoursetroContract.at('0xb64391ee40bbb39a3147a02ac9d6fa1e3bfcf80c');
-	console.log(Coursetro);
+	var pact = contract.at(address);
 
 	$("#button").click(function() {
-			$("#loader").show();
+		$("#loader").show();
 		var sectime = new Date($("#time").val()).getTime() ;
     		sectime /= 1000;
-            	Coursetro.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), sectime, {from: web3.eth.accounts[0], gas:3000000});
+            	pact.createpact($("#B_name").val(), $("#P_name").val(), $("#money").val(), sectime, {from: web3.eth.accounts[0], gas:3000000});
 	});
 
 	$("#button2").click(function() {
-		Coursetro.getData($("#C_id").val(),function(error,result){
+		pact.getData($("#C_id").val(),function(error,result){
 			if(!error) {
 				$("#Benefeciary").html(result[0] + ' id');
 				$("#Principal").html(result[1] + ' id');
@@ -217,29 +212,24 @@
 				var oldDate = old.getDate() + '/' + (old.getMonth()+1) + '/' + old.getFullYear();
 				$("#Date").html(oldDate);
 				var newd = new Date(result[4] * 1000);
-				var newDate = newd.getDate() + '/' + (newd.getMonth()+1) + '/' + newd.getFullYear();					$("#Time").html(newDate);
+				var newDate = newd.getDate() + '/' + (newd.getMonth()+1) + '/' + newd.getFullYear();			
+				$("#Time").html(newDate);
 				$("#isComplete").html(result[5] ? 'true' : 'false');	
-				console.log(result);
-                } else console.error(error);
+                }
 	})
 });
 
 	$("#button3").click(function() {
-
-            	Coursetro.completeContract($("#R_id").val(), {from: web3.eth.accounts[0], gas:300000});
+            	pact.completeContract($("#R_id").val(), {from: web3.eth.accounts[0], gas:300000});
 	});
 
-	var newContractEvent = Coursetro.NewPact();
+	var contractEvent = pact.NewPact();
 
-	newContractEvent.watch(function(error, result){
-            if (!error)
-                {
-                    $("#loader").hide();
-                    
-                    //$("#instructor").html(result.args.name + ' (' + result.args.age + ' years old)');
+	contractEvent.watch(function(error, result){
+            if (!error) {
+            	$("#loader").hide();
                 } else {
-                    $("#loader").hide();
-                    console.log(error);
+                $("#loader").hide();
                 }
         });
 
