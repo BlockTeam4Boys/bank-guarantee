@@ -1,7 +1,9 @@
 # Bank guarantee
 
-Работает без ошибок в браузере Firefox
-  Пример запуска под ropsten
+Работает без ошибок в браузере Firefox. 
+
+  Пример запуска под ropsten  
+  
   Для полноценной работы необходимо:
   1. Поднять ноду на localhost'е. Достаточно запустить geth с указанными ключами 
   sudo geth --testnet --syncmode="light" --rpc --rpcapi db,eth,net,web3,personal --cache=1024 --rpcport 8545 --rpcaddr 127.0.0.1 --rpccorsdomain "*" console 2>>geth.log 
