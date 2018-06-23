@@ -1,23 +1,38 @@
-pragma solidity ^0.4.0;
-contract Whitelist {
+pragma solidity ^0.4.24;
+contract BankData {
     
-    mapping(address => bool) w1;
-
-    event Check(
-        address member,
-        bool check
-    );
+    address public owner = msg.sender;
     
-    function addAddressw1(address member) public {
-        w1[member] = true;
-    }
-
-     function checkAddressw1(address member) public returns(bool) {
-        emit Check(member, w1[member]);
-        return w1[member];
+    mapping(address => bool) whitelist;
+    
+    modifier onlyBy(address _account) {
+        require(
+            msg.sender == _account,
+            "Sender not authorized."
+        );
+        _;
     }
     
-    function deleteAddressw1(address member) public {
-        w1[member] = false;
+    function changeOwner(address _newOwner) public onlyBy(owner) {
+        owner = _newOwner;
+    }
+    
+    event Check(address membe, bool check );
+    
+    function addAddress(address member) public onlyBy(owner) {
+        whitelist[member] = true;
+    }
+    
+    function addAddreses(address member) public {
+    // To be written
+    }
+    
+    function checkAddress(address member) public view returns(bool) {
+        emit Check(member, whitelist[member]);
+        return whitelist[member];
+    }
+    
+    function deleteAddress(address member) public {
+        whitelist[member] = false;
     }
 }
