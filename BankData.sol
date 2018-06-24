@@ -1,38 +1,53 @@
 pragma solidity ^0.4.24;
 contract BankData {
+    // should be guarantor's address
+    // only owner has a access
+    address owner = msg.sender;
     
-    address public owner = msg.sender;
-    
+    // true if user in whitelist
+    // false if not
     mapping(address => bool) whitelist;
     
-    modifier onlyBy(address _account) {
+    // TODO: CHANGE IT
+    // maximum possible value in currency (rubbles for example)
+    uint maxSum = 20000;
+    
+    // security check
+    // only guarantor can get access
+    // copy from https://solidity.readthedocs.io/en/latest/common-patterns.html#restricting-access
+    modifier onlyBy(address account) {
         require(
-            msg.sender == _account,
-            "Sender not authorized."
+            msg.sender == account,
+            "Well, you are not guarantor."
         );
         _;
     }
     
-    function changeOwner(address _newOwner) public onlyBy(owner) {
-        owner = _newOwner;
+    // change owner
+    // be careful with that function, only the new address will be guarantor
+    function changeOwner(address newOwner) external onlyBy(owner) {
+        owner = newOwner;
     }
     
-    event Check(address membe, bool check );
+    event Check(address user, bool check);
     
-    function addAddress(address member) public onlyBy(owner) {
-        whitelist[member] = true;
+    // input user in whitelist
+    function addOneAddress(address user) external onlyBy(owner) {
+        whitelist[user] = true;
     }
     
-    function addAddreses(address member) public {
-    // To be written
+    function addManyAddreses(address[] users) external onlyBy(owner) {
+        for (uint i = 0; i < users.length; i++) {
+            whitelist[users[i]] = true;
+        }
     }
     
-    function checkAddress(address member) public view returns(bool) {
-        emit Check(member, whitelist[member]);
-        return whitelist[member];
+    function checkAddress(address user) external onlyBy(owner) returns(bool) {
+        // emit Check(user, whitelist[user]);
+        return whitelist[user];
     }
     
-    function deleteAddress(address member) public {
-        whitelist[member] = false;
+    function deleteAddress(address user) external onlyBy(owner){
+        whitelist[user] = false;
     }
 }
