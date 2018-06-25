@@ -29,8 +29,6 @@ contract BankData {
         owner = newOwner;
     }
     
-    event Check(address user, bool check);
-    
     // input user in whitelist
     function addOneAddress(address user) external onlyBy(owner) {
         whitelist[user] = true;
@@ -42,8 +40,7 @@ contract BankData {
         }
     }
     
-    function checkAddress(address user) external onlyBy(owner) returns(bool) {
-        // emit Check(user, whitelist[user]);
+    function checkAddress(address user) external view onlyBy(owner) returns(bool) {
         return whitelist[user];
     }
     
