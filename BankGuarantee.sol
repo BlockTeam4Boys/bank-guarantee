@@ -1,4 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.20;
+
+import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
+
 contract BankGuarantee {
     // should be guarantor's address
     // only owner has a access
@@ -65,4 +68,34 @@ contract BankGuarantee {
     function completeContract(uint id) public onlyBy(owner) {
         pacts[id].ended = true;
     }
+    
+    //TIMER-->>
+    event LogConstructorInitiated(string nextStep); // for testing -->>
+    event LogCallback(uint time);
+    event LogNewOraclizeQuery(string description); // <<--for testing
+    
+    function __callback(bytes32 myid, string result) { 
+        if (msg.sender != oraclize_cbAddress()) revert();
+        //LogCallback(now); // test 
+        if (pacts[pact_id - 1].time - now > 0) {
+            createTimer(); // again if remain time
+        } else {
+            completeContract(pact_id - 1);
+        }   
+    }
+    
+    function createTimer() payable {
+        if (oraclize_getPrice("URL") > this.balance) {
+            //LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
+        } else {
+            if (pacts[pact_id - 1].time - pacts[pact_id - 1].date > 60 days) { // max period
+                //LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
+                oraclize_query(60 days,"URL", ""); // check at max time
+            } else {
+                //LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
+                oraclize_query(pacts[pact_id].time - pacts[pact_id].date,"URL", ""); // check at time
+            }
+        }
+    }
+    //<<--TIMER
 }
