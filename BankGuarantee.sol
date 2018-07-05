@@ -1,14 +1,32 @@
+// oraclize works with version which less than 0.4.20
 pragma solidity ^0.4.20;
 
 import "github.com/oraclize/ethereum-api/oraclizeAPI.sol";
 
+// interface for work with Whitelist contract
+contract Whitelist {
+    // we need only one function for reading
+    function checkAddress(address user) external view returns(bool);
+}
+
 contract BankGuarantee is usingOraclize {
+    // TODO: put here address which you get when deploy Whitelist.sol
+    address whitelist_address = 0x8c5F6A77b1602FdD19731bcbf1a62A0f1d267a5F;
+    Whitelist whitelist = Whitelist(whitelist_address);
+    
+    function changeWhitelist(address _whitelist_address) public onlyBy(owner) {
+        whitelist = Whitelist(_whitelist_address);
+    }
+    
     // should be guarantor's address
     // only owner has a access
     address public owner = msg.sender;
     // global variable for the identification of pacts
     uint private pact_id = 0;
-    uint maxValue = 20000; // guarantees limit. in your prefer currency
+    
+    // TODO: CHANGE IT
+    // guarantees limit. In your prefer currency
+    uint maxValue = 20000;
 
     // security check
     // only guarantor can get access
@@ -23,10 +41,9 @@ contract BankGuarantee is usingOraclize {
     
     // whitelist check
     // only whitelisted user can get access
-    modifier onlyWhitelistUser() {
+    modifier onlyWhitelistUser(address candidate) {
         require (
-            // TODO: check with BankData
-            true == true,
+            whitelist.checkAddress(candidate),
             "Well, you are not from whitelist."
         );
         _;
@@ -54,14 +71,16 @@ contract BankGuarantee is usingOraclize {
         address principal;
         address beneficiary; 
         uint    money;
-        uint    start_time; // when pacts is start
-        uint    end_time;   // when pacts is end
+        uint    start_time; // when pacts is end
+        uint    end_time; // when pacts is end
         bool    accept;
         bool    ended;
     }
     
-    function createPactByPrincipal(address _beneficiary, uint _money, uint _end_time) public onlyWhitelistUser() returns (uint) {
+    function createPactByPrincipal(address _beneficiary, uint _money, uint _end_time) public onlyWhitelistUser(msg.sender) returns (uint) {
         require(_money <= maxValue, "Cash limit exceeded.");
+        require(_end_time > now, "end_time cannot be less than now. It is impossible.");
+        
         uint id = pact_id++;
         pacts[id].principal = msg.sender;
         pacts[id].beneficiary = _beneficiary;
@@ -70,17 +89,17 @@ contract BankGuarantee is usingOraclize {
         return id;
     }
     
-    function acceptContractByBeneficiary(address _principal, uint _money, uint _end_time, uint _pact_id) public onlyWhitelistUser() returns(bool) {
+    function acceptContractByBeneficiary(address _principal, uint _money, uint _end_time, uint _pact_id) public onlyWhitelistUser(msg.sender) returns(bool) {
         if (lock == true) return false;
-        require(_end_time > now, "end_time cannot be less than now. It is impossible.");
         lock = true;
-        uint id = pact_id;
-        if ((pacts[id].principal == _principal) && (pacts[id].beneficiary == msg.sender) && (pacts[id].money == _money) && (pacts[id].end_time == _end_time)) {
-            pacts[id].accept = true;   
-            pacts[id].start_time = now;
-            add(_end_time - pacts[id].start_time, id);
+        
+        if ((pacts[_pact_id].principal == _principal) && (pacts[_pact_id].beneficiary == msg.sender) && (pacts[_pact_id].money == _money) && (pacts[_pact_id].end_time == _end_time)) {
+            pacts[_pact_id].accept = true;   
+            pacts[_pact_id].start_time = now;
+            add(_end_time - pacts[_pact_id].start_time, _pact_id);
         }
         lock = false;
+        if (_end_time - now < minTime) create_timer();
         return true;
     }
     
@@ -88,7 +107,8 @@ contract BankGuarantee is usingOraclize {
         return (pacts[id].beneficiary, pacts[id].principal, pacts[id].money, pacts[id].start_time, pacts[id].end_time, pacts[id].accept, pacts[id].ended);
     }
     
-    function completeContract(uint id) public {
+    function completeContract(uint id) public onlyWhitelistUser(msg.sender) {
+        // TODO
         pacts[id].ended = true;
     }
 
@@ -150,40 +170,64 @@ contract BankGuarantee is usingOraclize {
     // this is fallback function
     function() public payable {}
 
-    //end_timeR-->>
-    event LogConstructorInitiated(string nextStep); // for testing -->>
+    //TIMER-->>
+    uint minTime = ~uint256(0); // maximal possible value
+    
     event LogCallback(uint end_time);
     event LogNewOraclizeQuery(string description); // <<--for testing
     
     function __callback(bytes32 myid, string result) { 
         if (msg.sender != oraclize_cbAddress()) revert();
-        //LogCallback(now); // test 
-        if (pacts[pact_id - 1].end_time - now > 0) {
-            createend_timer(); // again if remain end_time
+        while (lock) {
+            // NOP
+            // lock == true будет равен не долго
+        }
+        lock = true;
+        uint end_time;
+        uint id;
+        (end_time, id) = getMax();
+        lock = false;
+        
+        if (pacts[id].end_time > now) {
+            create_timer(); // again if remain end_time
         } else {
-            completeContract(pact_id - 1);
+            // completeContract(pact_id - 1);
+            // no function call, just code. For safety
+            // what if someone with no rigth call public completeContract()?
+            pacts[id].ended = true;
+            create_timer();
         }   
     }
 
-    function createend_timer() public returns(bool) {
-        if (oraclize_getPrice("URL") > address(this).balance ) {
+    function create_timer() public {
+        if (oraclize_getPrice("URL") > address(this).balance) {
+            minTime = ~uint256(0);
             emit LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
         } else {
-            if (!lock) return false;
+            while (lock) {
+                // NOP
+                // lock == true is not such a long time
+            }
             lock = true;
-            uint end_time;
-            uint id;
-            (end_time, id) = getMax();
+            uint end_time = heap[0].end_time;
             lock = false;
             
+            //this if construction mean pacts is empty
+            if (end_time == 0) {
+                minTime = ~uint256(0);
+                emit LogNewOraclizeQuery("Oraclize query was NOT sent. It is empty");
+                return;
+            }
             if (end_time > 60 days) { // max period
+                minTime = 60 * 24 * 60 * 60 * 1000;
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
                 oraclize_query(60 days,"URL", ""); // check at max end_time
             } else {
+                minTime = end_time - now;
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
                 oraclize_query(end_time, "URL", ""); // check at end_time
             }
         }
     }
-    //<<--end_timeR
+   //<<--TIMER
 }
