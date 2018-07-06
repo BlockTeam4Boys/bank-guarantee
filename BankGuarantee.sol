@@ -208,6 +208,10 @@ contract BankGuarantee is usingOraclize {
             lock = true;
             uint end_time = heap[0].end_time;
             lock = false;
+            if (end_time == 0) {
+                return;
+                timerCount--;
+            }
             
             if (end_time - now > 60 days) { // max period
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
