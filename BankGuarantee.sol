@@ -56,14 +56,13 @@ contract BankGuarantee is usingOraclize {
     }
     
     // the main data structures for contract
-    // think about change to T[]
     mapping (uint => Pacts) private pacts;
     HeapNode[] private heap;
     bool private lock = false;
     
     struct HeapNode {
-        uint end_time; // key
-        uint id; // value
+        uint end_time;  // key
+        uint id;        // value
     }
     
     struct Pacts {
@@ -71,8 +70,8 @@ contract BankGuarantee is usingOraclize {
         address principal;
         address beneficiary; 
         uint    money;
-        uint    start_time; // when pacts is end
-        uint    end_time; // when pacts is end
+        uint    start_time; // when pacts is start
+        uint    end_time;   // when pacts is end
         bool    accept;
         bool    ended;
     }
@@ -99,7 +98,7 @@ contract BankGuarantee is usingOraclize {
             add(_end_time - pacts[_pact_id].start_time, _pact_id);
         }
         lock = false;
-        if (_end_time - now < minTime) create_timer();
+        create_timer();
         return true;
     }
     
@@ -171,7 +170,7 @@ contract BankGuarantee is usingOraclize {
     function() public payable {}
 
     //TIMER-->>
-    uint minTime = ~uint256(0); // maximal possible value
+    uint timerCount = 0;
     
     event LogCallback(uint end_time);
     event LogNewOraclizeQuery(string description); // <<--for testing
@@ -180,30 +179,28 @@ contract BankGuarantee is usingOraclize {
         if (msg.sender != oraclize_cbAddress()) revert();
         while (lock) {
             // NOP
-            // lock == true будет равен не долго
+            // lock == true is not such a long time
+
         }
+        
         lock = true;
         uint end_time;
         uint id;
         (end_time, id) = getMax();
         lock = false;
         
-        if (pacts[id].end_time > now) {
-            create_timer(); // again if remain end_time
-        } else {
-            // completeContract(pact_id - 1);
-            // no function call, just code. For safety
-            // what if someone with no rigth call public completeContract()?
-            pacts[id].ended = true;
-            create_timer();
-        }   
+        if (pacts[id].end_time <= now) {
+             pacts[id].ended = true;
+        }
+        timerCount--;
+        if (timerCount == 0) create_timer();
     }
 
     function create_timer() public {
         if (oraclize_getPrice("URL") > address(this).balance) {
-            minTime = ~uint256(0);
             emit LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
         } else {
+            timerCount++;
             while (lock) {
                 // NOP
                 // lock == true is not such a long time
@@ -212,22 +209,14 @@ contract BankGuarantee is usingOraclize {
             uint end_time = heap[0].end_time;
             lock = false;
             
-            //this if construction mean pacts is empty
-            if (end_time == 0) {
-                minTime = ~uint256(0);
-                emit LogNewOraclizeQuery("Oraclize query was NOT sent. It is empty");
-                return;
-            }
-            if (end_time > 60 days) { // max period
-                minTime = 60 * 24 * 60 * 60 * 1000;
+            if (end_time - now > 60 days) { // max period
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
                 oraclize_query(60 days,"URL", ""); // check at max end_time
             } else {
-                minTime = end_time - now;
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
                 oraclize_query(end_time, "URL", ""); // check at end_time
             }
         }
     }
-   //<<--TIMER
+    //<<--TIMER
 }
