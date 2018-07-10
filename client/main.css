@@ -1,0 +1,45 @@
+body {
+    	font-size: 11pt; /* Размер шрифта в пунктах */ 
+    	background-color:#F0F0F0;
+	padding: 0.5em;
+	font-family: 'Raleway','Source Sans Pro', 'Arial';
+}
+.container {
+    	float: left;
+    	width: 20%;
+}
+.containerInfo {
+ 	float: left;
+    	margin-right: 25px; /* Отступ справа */
+}
+label {
+    	display:block;
+    	margin-bottom:8px;
+}
+input {
+    	padding:10px;
+    	margin-bottom: 1em;
+}
+button {
+    	margin: 2em 0;
+    	padding: 1em;
+    	display:block;
+}
+
+#loader {
+    	display:none;
+    	width: 100px;
+    	position: absolute;
+    	bottom: 0;
+    	right: 0;
+}
+.info {
+    	padding:1em;
+    	background-color:#fff;
+    	width : 70%
+}
+.infoBig {
+    	padding:1em;
+    	background-color:#fff;
+    	width : 340px;
+}

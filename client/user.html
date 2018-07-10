@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    	<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+   	 <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Bank</title>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	
+	<link href='main.css' rel='stylesheet' type='text/css'>
+</head>
+
+<body>    
+	<div class="container">
+		<h2>Create pact</h2>
+
+        	<label for="name" class="col-lg-2 control-label">Beneficiary address</label>
+        	<input id="B_nameCreate" type="text">
+
+		<label for="name" class="col-lg-2 control-label">Money</label>
+		<input  id="moneyCreate" type="text">
+
+		<label  for="name" class="col-lg-2 control-label">End time</label>
+        	<input  placeholder="June 17, 2018" id="timeCreate" type="text">
+
+        	<button id="buttonCreate">Create request</button>
+
+		<label for="name" class="col-lg-2 control-label">Your pacts id</label>
+		<input  id="pactsid" type="text">
+
+	</div>
+
+	<div class="container">
+	
+		<h2>Accept pact</h2>
+
+        	<label for="name" class="col-lg-2 control-label">Principal address</label>
+        	<input id="P_nameAccept" type="text">
+	
+		<label for="name" class="col-lg-2 control-label">Money</label>
+		<input  id="moneyAccept" type="text">
+	
+		<label  for="name" class="col-lg-2 control-label">End time</label>
+	        <input  placeholder="June 17, 2019" id="timeAccept" type="text">
+	
+		<label for="name" class="col-lg-2 control-label">Pact id</label>
+		<input  id="pactidAccept" type="text">	
+	
+        	<button id="buttonAccept">Сonfirm a bank guarantee</button>
+
+		<label for="name" class="col-lg-2 control-label">Is accept</label>
+		<input  id="isAccept" type="text">
+
+	</div>
+		
+	<div class="container">
+
+        	<h2>Get data about pact</h2>
+		<label for="name" class="col-lg-2 control-label">Pact id</label>
+		<input  id="getdataid" type="text">
+
+        	<button id="buttonGet">Get data</button>
+
+		<div class = containerInfo>
+		<p>Benefeciary</p>
+		<p class="infoBig" id="Benefeciary"></p>
+		</div>
+
+		<div class = containerInfo>
+		<p>Principal</p>
+		<p class="infoBig" id="Principal"></p>
+		</div>
+		<div class = containerInfo>
+		<p>Money</p>
+		<p class="info" id="Money"></p>
+		</div>
+		<div class = containerInfo>
+		<p>Accept money</p>
+		<p class="info" id="AcceptMoney"></p>
+		</div>
+		<div class = containerInfo>
+		<p>End date</p>
+		<p class="info" id="Time"></p>
+		</div>
+		<div class = containerInfo>
+		<p>isAccepted</p>
+		<p class="info" id="isAccepted"></p>
+		</div>
+		<div class = containerInfo>
+		<p>isComplete</p>
+		<p class="info" id="isComplete"></p>
+		</div>
+	</div>
+
+<div class="container">
+
+        <h2>Complete pact</h2>        	
+
+		<label for="name" class="col-lg-2 control-label">Pacts id</label>
+        	<input id="IDcomplete" type="text">
+		<button id="buttonComplete">Complete</button>
+	</div>
+
+<div class="container">
+
+        <h2>Change pact</h2>        	
+
+		<label for="name" class="col-lg-2 control-label">Pacts id</label>
+        	<input id="changeID" type="text">
+	        <label for="name" class="col-lg-2 control-label">Money</label>
+        	<input id="NewMoney" type="text">
+		<button id="buttonChange">Change paid</button>
+
+     <h2>Accept paid</h2>        	
+
+		<label for="name" class="col-lg-2 control-label">Pacts id</label>
+        	<input id="IDaccept" type="text">
+	        <label for="name" class="col-lg-2 control-label">Money</label>
+        	<input id="moneyAcceptPaid" type="text">
+		<button id="buttonAcceptPaid">Accept paid</button>
+	</div>
+
+        <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+
+</body>
+<script type="text/javascript"  src='user.js'></script>
+</html>

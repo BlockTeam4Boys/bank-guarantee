@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    	<meta charset="UTF-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+   	 <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Bank</title>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	
+	<link href='main.css' rel='stylesheet' type='text/css'>
+
+</head>
+<body>    
+<div class="container">
+		<h2>Add user address in whitelist</h2>
+
+        	<label for="name" class="col-lg-2 control-label">User address</label>
+        	<input id="UserAddressAdd" type="text">
+
+        	<button id="buttonAddOne">Add</button>
+
+	</div>
+
+	<div class="container">
+		<h2>Delete user from whitelist</h2>
+
+        	<label for="name" class="col-lg-2 control-label">User address</label>
+        	<input id="UserAddressDelete" type="text">
+
+        	<button id="buttonDeleteOne">Remove</button>
+
+	</div>
+	<div class="container">
+		<h2>Check user address</h2>
+
+        	<label for="name" class="col-lg-2 control-label">User address</label>
+        	<input id="UserAddressCheck" type="text">
+
+        	<button id="buttonCheck">Check</button>
+
+        	<label for="name" class="col-lg-2 control-label">Result</label>
+        	<input id="CheckResult" type="text">
+
+	</div>
+
+        <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
+</body>
+<script type="text/javascript"  src='bank.js'></script>
+</html>
