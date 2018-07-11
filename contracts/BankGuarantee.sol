@@ -60,7 +60,7 @@ contract BankGuarantee is usingOraclize {
     }
     
     struct Pacts {
-        uint    id;
+        uint    id; 
         address principal;
         address beneficiary; 
         uint    money;
@@ -75,7 +75,7 @@ contract BankGuarantee is usingOraclize {
         bool    ended;
     }
     
-    function createPactByPrincipal(address _beneficiary, uint _money, uint _end_time) public onlyWhitelistUser(msg.sender) returns (uint) {
+    function createPactByPrincipal(address _beneficiary, uint _money, uint _end_time) external onlyWhitelistUser(msg.sender) returns (uint) {
         require(_money <= maxValue, "Cash limit exceeded.");
         require(_end_time > now, "end_time cannot be less than now. It is impossible.");
         uint id = pact_id++;
@@ -87,7 +87,7 @@ contract BankGuarantee is usingOraclize {
         return id;
     }
     
-    function acceptContractByBeneficiary(address _principal, uint _money, uint _end_time, uint _pact_id) public onlyWhitelistUser(msg.sender) returns(bool) {
+    function acceptContractByBeneficiary(address _principal, uint _money, uint _end_time, uint _pact_id) external onlyWhitelistUser(msg.sender) returns(bool) {
         if (lock == true) {
             emit Accept(false);
             return false;
@@ -97,7 +97,7 @@ contract BankGuarantee is usingOraclize {
         if ((pacts[_pact_id].principal == _principal) && (pacts[_pact_id].beneficiary == msg.sender) && (pacts[_pact_id].money == _money) && (pacts[_pact_id].end_time == _end_time)) {
             pacts[_pact_id].accept = true;   
             pacts[_pact_id].start_time = now;
-            add(_end_time - pacts[_pact_id].start_time, _pact_id);
+            add(_end_time, _pact_id);
         } else {
             lock = false;
             emit Accept(false);
@@ -106,18 +106,18 @@ contract BankGuarantee is usingOraclize {
         lock = false;
         emit Accept(true);
         
-        if (_end_time - pacts[_pact_id].start_time < minTime) {
-            minTime = _end_time - pacts[_pact_id].start_time;
+        if (_end_time < minTime) {
+            minTime = _end_time;
             create_timer(minTime);
         }
         return true;
     }
     
-    function getData(uint id) public view returns(address, address, uint, uint, uint, bool, bool) {
+    function getData(uint id) external view returns(address, address, uint, uint, uint, bool, bool) {
         return (pacts[id].beneficiary, pacts[id].principal, pacts[id].money, pacts[id].accept_paid, pacts[id].end_time, pacts[id].accept, pacts[id].ended);
     }
    
-    function changePact(uint id, uint newMoney) public {
+    function changePact(uint id, uint newMoney) external {
         if (msg.sender == pacts[id].beneficiary) {
             pacts[id].new_money_by_beneficiary = newMoney;
         }
@@ -130,7 +130,7 @@ contract BankGuarantee is usingOraclize {
         emit Complete();
     }
     
-    function completeContract(uint id) public {
+    function completeContract(uint id) external {
         if (pacts[id].beneficiary == msg.sender) pacts[id].ended_by_beneficiary = true;
         if (pacts[id].principal == msg.sender) pacts[id].ended_by_principal = true;
 
@@ -139,7 +139,7 @@ contract BankGuarantee is usingOraclize {
         emit Complete();
     }
     
-    function acceptPayment(uint id, uint payment) public {
+    function acceptPayment(uint id, uint payment) external {
         if (pacts[id].beneficiary == msg.sender) {
             pacts[id].accept_paid += payment;
         }
@@ -154,7 +154,7 @@ contract BankGuarantee is usingOraclize {
         uint i = heap.length - 1;
         uint parent = (i - 1) / 2;
         
-        while (i > 0 && heap[parent].end_time < heap[i].end_time) {
+        while (i > 0 && heap[parent].time < heap[i].time) {
             HeapNode memory temp = heap[i];
             heap[i] = heap[parent];
             heap[parent] = temp;
@@ -163,14 +163,14 @@ contract BankGuarantee is usingOraclize {
         }
     }
     
-    function getMin() private returns (uint end_time, uint id) {
+    function getMin() private returns (uint time, uint id) {
         HeapNode memory result = heap[0];
         heap[0] = heap[heap.length - 1];
         delete heap[heap.length - 1];
         heap.length--;
         
         heapify(0);
-        return (result.end_time, result.id);
+        return (result.time, result.id);
     }
     
     function heapify(uint i) private {
@@ -183,10 +183,10 @@ contract BankGuarantee is usingOraclize {
             rightChild = 2 * i + 2;
             largestChild = i;
 
-            if (leftChild < heap.length && heap[leftChild].end_time > heap[largestChild].end_time) {
+            if (leftChild < heap.length && heap[leftChild].time > heap[largestChild].time) {
                 largestChild = leftChild;
             }
-            if (rightChild < heap.length && heap[rightChild].end_time > heap[largestChild].end_time) {
+            if (rightChild < heap.length && heap[rightChild].time > heap[largestChild].time) {
                 largestChild = rightChild;
             }
             if (largestChild == i) break;
@@ -207,8 +207,7 @@ contract BankGuarantee is usingOraclize {
     //TIMER-->>
     uint timerCount = 0;
     uint minTime = -uint(0);
-    
-    event LogCallback(uint end_time);
+
     event LogNewOraclizeQuery(string description); // <<--for testing
     
     function __callback(bytes32 myid, string result) { 
@@ -220,15 +219,14 @@ contract BankGuarantee is usingOraclize {
         }
         
         lock = true;
-        uint end_time;
+        uint time;
         uint id;
-        (end_time, id) = getMin();
+        (time, id) = getMin();
 
         if (pacts[id].end_time <= now) {
-             pacts[id].ended = true;
+            pacts[id].ended = true;
         }
-        
-        minTime = heap[0].end_time;
+        minTime = heap[0].time;
         lock = false;
 
         if (timerCount == 0) create_timer(minTime);
@@ -239,12 +237,12 @@ contract BankGuarantee is usingOraclize {
             emit LogNewOraclizeQuery("Oraclize query was NOT sent, please add some ETH to cover for the query fee");
         } else {
             timerCount++;
-            if (minT > 60 days) { // max period
+            if (minT - now > 60 days) { // max period
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
                 oraclize_query(60 days,"URL", ""); // check at max end_time
             } else {
                 emit LogNewOraclizeQuery("Oraclize query was sent, standing by for the answer..");
-                oraclize_query(minT, "URL", ""); // check at end_time
+                oraclize_query(minT - now, "URL", ""); // check at end_time
             }
         }
     }
