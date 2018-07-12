@@ -154,7 +154,7 @@ contract BankGuarantee is usingOraclize {
         uint i = heap.length - 1;
         uint parent = (i - 1) / 2;
         
-        while (i > 0 && heap[parent].time < heap[i].time) {
+        while (i > 0 && heap[parent].end_time < heap[i].end_time) {
             HeapNode memory temp = heap[i];
             heap[i] = heap[parent];
             heap[parent] = temp;
@@ -170,7 +170,7 @@ contract BankGuarantee is usingOraclize {
         heap.length--;
         
         heapify(0);
-        return (result.time, result.id);
+        return (result.end_time, result.id);
     }
     
     function heapify(uint i) private {
@@ -183,10 +183,10 @@ contract BankGuarantee is usingOraclize {
             rightChild = 2 * i + 2;
             largestChild = i;
 
-            if (leftChild < heap.length && heap[leftChild].time > heap[largestChild].time) {
+            if (leftChild < heap.length && heap[leftChild].end_time > heap[largestChild].end_time) {
                 largestChild = leftChild;
             }
-            if (rightChild < heap.length && heap[rightChild].time > heap[largestChild].time) {
+            if (rightChild < heap.length && heap[rightChild].end_time > heap[largestChild].end_time) {
                 largestChild = rightChild;
             }
             if (largestChild == i) break;
@@ -226,7 +226,7 @@ contract BankGuarantee is usingOraclize {
         if (pacts[id].end_time <= now) {
             pacts[id].ended = true;
         }
-        minTime = heap[0].time;
+        minTime = heap[0].end_time;
         lock = false;
 
         if (timerCount == 0) create_timer(minTime);
