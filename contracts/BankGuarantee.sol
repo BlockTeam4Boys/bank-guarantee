@@ -31,13 +31,6 @@ contract BankGuarantee is usingOraclize {
     // security check
     // only guarantor can get access
     // copy from https://solidity.readthedocs.io/en/latest/common-patterns.html#restricting-access
-    modifier onlyBy(address account) {
-        require(
-            msg.sender == account,
-            "Well, you are not guarantor."
-        );
-        _;
-    }
     
     // whitelist check
     // only whitelisted user can get access
@@ -206,7 +199,7 @@ contract BankGuarantee is usingOraclize {
 
     //TIMER-->>
     uint timerCount = 0;
-    uint minTime = -uint(0);
+    uint minTime = -uint(0); // smth big
 
     event LogNewOraclizeQuery(string description); // <<--for testing
     
@@ -229,6 +222,10 @@ contract BankGuarantee is usingOraclize {
         minTime = heap[0].end_time;
         lock = false;
 
+        if (minTime == 0) {
+            minTime = -uint(0);
+            return;
+        }
         if (timerCount == 0) create_timer(minTime);
     }
 
